@@ -8,7 +8,7 @@ import { Router, useRouter } from "vue-router";
 import { Store, useStore } from "@/store/store";
 import { User } from "@/interfaces/User";
 
-const server = "http://localhost:3001";
+const server = `http://${location.hostname}:3001`;
 
 const connection = (user: User, router: Router, store: Store) => {
   console.log("CONNECTION");
