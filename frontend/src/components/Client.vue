@@ -1,6 +1,6 @@
 <template><div></div></template>
 <script lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, reactive, computed } from "vue";
 import io from "socket.io-client";
 import bus from "@/lib/bus";
 import { Events, StatusSocket } from "@/const";
@@ -11,7 +11,6 @@ import { User } from "@/interfaces/User";
 const server = `http://${location.hostname}:3001`;
 
 const connection = (user: User, router: Router, store: Store) => {
-  console.log("CONNECTION");
   const socket = io(`${server}?userid=${user.id}`);
 
   let room = "";
@@ -19,7 +18,7 @@ const connection = (user: User, router: Router, store: Store) => {
 
   //Событие захода в комнату
   const joinRoom = (roomKey: string) => {
-    console.log("Заходим в комнату");
+    console.log("Заходим в комнату", user);
     room = roomKey;
     socket.emit("join-in-room", { key: roomKey, id: user.id, name: user.name });
   };
@@ -92,20 +91,24 @@ export default {
   name: "Client",
   setup() {
     onMounted(() => {
-      const name = ref<string>();
-      name.value = useStore().getters.name;
-      const id = ref<string>();
-      id.value = useStore().getters.id;
+      const name = computed<string>(() => {
+        return useStore().getters.name;
+      });
+      const id = computed<string>(() => {
+        return useStore().getters.id;
+      });
       const router: Router = useRouter();
       const store: Store = useStore();
-      const user = ref<User>({
-        id: id.value,
-        name: name.value,
+      const user = reactive({
+        id: computed(() => id.value),
+        name: computed(() => name.value),
         balance: "-1",
         creater: false,
       });
 
-      connection(user.value, router, store);
+      console.log(user, id.value, name.value);
+
+      connection(user, router, store);
     });
   },
 };

@@ -17,7 +17,7 @@
   <div class="secondText">Участники</div>
   <div class="users">
     <div v-for="item in users" :key="item.id">
-      <div class="user" v-if="item.balance === '-1'">
+      <div class="user" v-if="item.balance == '-1'">
         <div class="name">{{ item.name }}</div>
       </div>
     </div>

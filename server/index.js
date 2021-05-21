@@ -107,15 +107,31 @@ io.on("connection", (socket) => {
   });
 
   socket.on("refuse-admin", (data) => {
-    console.log("refuse-admin", globalUsers[data.id].creater);
+    let users = userRoom.get(data.key);
 
-    if (globalUsers[data.id].creater) {
+    console.log("refuse-admin", globalUsers[data.id].creater);
+    console.log(globalUsers);
+    console.log(data);
+    console.log(users);
+
+    if (users && users[data.id]) {
+      users[data.id].creater = false;
+
+      if (creater[data.key]) {
+        delete creater[data.key];
+      }
+
+      userRoom.set(data.key, users);
+      io.to(data.key).emit("update-users", userRoom.get(data.key));
+    }
+
+    /*if (globalUsers[data.id].creater) {
       globalUsers[data.id].creater = false;
       delete creater[data.key];
       let users = userRoom.get(data.key);
       users[data.id].creater = false;
       io.to(data.key).emit("update-users", userRoom.get(data.key));
-    }
+    }*/
   });
 
   socket.on("start-vote", (data) => {
@@ -153,10 +169,7 @@ io.on("connection", (socket) => {
       }
 
       //Отправляем всем кто есть в этой комнате
-      io.to(usertmp.room).emit(
-        "update-users",
-        userRoom.get(globalUsers[socket.id])
-      );
+      io.to(usertmp.room).emit("update-users", userRoom.get(usertmp.room));
     }
   });
 });
