@@ -1,32 +1,34 @@
-import { User } from "@/interfaces/User";
+import { User, SetUser } from "@/interfaces/User";
 import { MutationTree } from "vuex";
 import { State } from "./state";
 
-interface SetUser {
-  socket: string;
-  id: string;
+export enum MutationTypes {
+  setName = "set-name",
+  setUsers = "set-users",
+  setUser = "set-user",
+  roomSettingsViewBalance = "room-settings-view-balance",
 }
 
 export type Mutations<S = State> = {
-  setName(state: S, payload: string): void;
-  setUsers(state: S, payload: User[] | []): void;
-  setUser(state: S, payload: SetUser): void;
-  roomSettingsViewBalance(state: S, payload: boolean): void;
+  [MutationTypes.setName](state: S, payload: string): void;
+  [MutationTypes.setUsers](state: S, payload: User[] | []): void;
+  [MutationTypes.setUser](state: S, payload: SetUser): void;
+  [MutationTypes.roomSettingsViewBalance](state: S, payload: boolean): void;
 };
 
 export const mutations: MutationTree<State> & Mutations = {
-  setName(state, payload: string) {
+  [MutationTypes.setName](state, payload: string) {
     state.name = payload;
   },
-  setUsers(state, payload: User[] | []) {
+  [MutationTypes.setUsers](state, payload: User[] | []) {
     state.users = payload;
   },
-  setUser(state, payload: SetUser) {
+  [MutationTypes.setUser](state, payload: SetUser) {
     state.id = payload.id;
     state.socketUserId = payload.socket;
     localStorage["id"] = payload.id;
   },
-  roomSettingsViewBalance(state, payload: boolean) {
+  [MutationTypes.roomSettingsViewBalance](state, payload: boolean) {
     state.roomSettingsViewBalance = payload;
   },
 };

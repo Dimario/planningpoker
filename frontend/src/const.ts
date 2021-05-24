@@ -1,6 +1,15 @@
+import { MutationTypes } from "@/store/mutations";
+
 export const Events = {
   create: {
     room: "create-room",
+  },
+  front: {
+    ...MutationTypes,
+  },
+  server: {
+    joinRoom: "join-in-room",
+    updateUsers: "update-users",
   },
   statusBar: {
     statusChange: "status-change",

@@ -1,16 +1,13 @@
-<template><div></div></template>
-<script lang="ts">
-import { onMounted, ref, reactive, computed } from "vue";
 import io from "socket.io-client";
 import bus from "@/lib/bus";
 import { Events, StatusSocket } from "@/const";
-import { Router, useRouter } from "vue-router";
-import { Store, useStore } from "@/store/store";
+import { Router } from "vue-router";
+import { Store } from "@/store/store";
 import { User } from "@/interfaces/User";
 
 const server = `http://${location.hostname}:3001`;
 
-const connection = (user: User, router: Router, store: Store) => {
+export function connection(user: User, router: Router, store: Store) {
   const socket = io(`${server}?userid=${user.id}`);
 
   let room = "";
@@ -20,12 +17,20 @@ const connection = (user: User, router: Router, store: Store) => {
   const joinRoom = (roomKey: string) => {
     console.log("Заходим в комнату", user);
     room = roomKey;
-    socket.emit("join-in-room", { key: roomKey, id: user.id, name: user.name });
+    socket.emit(Events.server.joinRoom, {
+      key: roomKey,
+      id: user.id,
+      name: user.name,
+    });
   };
 
   const setBalance = (card: string) => {
     if (card === "x") card = "-1";
-    socket.emit("set-balance", { id: user.id, key: room, balance: card });
+    socket.emit(Events.poker.setBalance, {
+      id: user.id,
+      key: room,
+      balance: card,
+    });
   };
 
   const promotionAdmin = () => {
@@ -55,17 +60,17 @@ const connection = (user: User, router: Router, store: Store) => {
      * Логика приложения
      */
     //Установка базовых значений для юзера
-    socket.on("set-user", (user: { socket: string; id: string }) => {
-      store.commit("setUser", user);
+    socket.on(Events.front.setUser, (user: { socket: string; id: string }) => {
+      store.commit(Events.front.setUser, user);
     });
     //Создание комнаты
     bus.$on(Events.create.room, () => socket.emit(Events.create.room, user.id));
     //Ответ после создания комнаты и автомаческий переход в комнату
-    socket.on("create-room", (key: string) => router.push(`/r/${key}`));
+    socket.on(Events.create.room, (key: string) => router.push(`/r/${key}`));
     //Получаем пользователей комнаты
-    socket.on("update-users", (users: User[] | []) => {
-      console.log("update-users", users);
-      store.commit("setUsers", users);
+    socket.on(Events.server.updateUsers, (users: User[] | []) => {
+      console.log(Events.server.updateUsers, users);
+      store.commit(Events.front.setUsers, users);
     });
 
     socket.on(Events.poker.startVoteServer, () => {
@@ -74,9 +79,6 @@ const connection = (user: User, router: Router, store: Store) => {
     socket.on(Events.poker.endVoteAnswer, () => {
       bus.$emit(Events.poker.endVoteAnswer);
     });
-    /**
-     * Остальная логика
-     */
   });
 
   bus.$on(Events.get.room.id, (key: string) => joinRoom(key));
@@ -85,31 +87,4 @@ const connection = (user: User, router: Router, store: Store) => {
   bus.$on(Events.poker.refuseAdmin, refuseAdmin);
   bus.$on(Events.poker.startVote, startVote);
   bus.$on(Events.poker.endVote, endVote);
-};
-
-export default {
-  name: "Client",
-  setup() {
-    onMounted(() => {
-      const name = computed<string>(() => {
-        return useStore().getters.name;
-      });
-      const id = computed<string>(() => {
-        return useStore().getters.id;
-      });
-      const router: Router = useRouter();
-      const store: Store = useStore();
-      const user = reactive({
-        id: computed(() => id.value),
-        name: computed(() => name.value),
-        balance: "-1",
-        creater: false,
-      });
-
-      console.log(user, id.value, name.value);
-
-      connection(user, router, store);
-    });
-  },
-};
-</script>
+}

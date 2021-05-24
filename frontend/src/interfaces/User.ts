@@ -4,3 +4,8 @@ export interface User {
   balance: string;
   creater: boolean;
 }
+
+export interface SetUser {
+  socket: string;
+  id: string;
+}

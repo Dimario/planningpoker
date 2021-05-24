@@ -4,8 +4,9 @@ const http = require("http");
 const app = express();
 const server = http.createServer(app).listen(3001);
 const io = require("socket.io")(server, { cors: { origin: "*" } });
+import { Events } from "../frontend/src/const";
 
-let userRoom = new Map(),
+const userRoom = new Map(),
   globalUsers = {},
   globalSocketUsers = {},
   creater = {};
@@ -30,9 +31,9 @@ io.on("connection", (socket) => {
   globalSocketUsers[socket.id] = userid;
 
   //Событие создание комнаты
-  socket.on("create-room", (userid) => {
+  socket.on(Events.create.room, (userid) => {
     let key = uuidv4();
-    socket.emit("create-room", key);
+    socket.emit(Events.create.room, key);
     creater[key] = userid;
     userRoom.set(key, {});
   });
@@ -40,19 +41,18 @@ io.on("connection", (socket) => {
   /**
    * Вход в комнату
    */
-  socket.on("join-in-room", (data) => {
+  socket.on(Events.server.joinRoom, (data) => {
     if (data.id !== "") {
-      console.log(`tut zahodim, ${data.key}, ${data.id}, ${data.name}`);
+      let users = {};
+
+      console.log(`enter room: ${data.key}, ${data.id}, ${data.name}`);
 
       //Проверяем есть ли в руме пользователи
       if (userRoom.get(data.key) !== undefined) {
-        users = userRoom.get(data.key);
-      } else {
-        users = {};
+        let users = userRoom.get(data.key);
       }
 
-      let createrLogic =
-        creater[data.key] && creater[data.key] === data.id ? true : false;
+      let createrLogic = creater[data.key] && creater[data.key] === data.id;
 
       users[data.id] = {
         name: data.name,
@@ -72,17 +72,18 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("set-balance", (data) => {
+  socket.on(Events.poker.setBalance, (data) => {
     console.log(`set-balance - socket.id=${socket.id}`);
 
     if (userRoom.get(data.key)) {
       console.log(`set-balance -- ${data.balance}`);
+      let users = {};
       users = userRoom.get(data.key);
       users[data.id]["balance"] = data.balance;
       userRoom.set(data.key, users);
     }
 
-    io.to(data.key).emit("update-users", userRoom.get(data.key));
+    io.to(data.key).emit(Events.server.updateUsers, userRoom.get(data.key));
   });
 
   socket.on("promotion-admin", (data) => {
@@ -124,21 +125,13 @@ io.on("connection", (socket) => {
       userRoom.set(data.key, users);
       io.to(data.key).emit("update-users", userRoom.get(data.key));
     }
-
-    /*if (globalUsers[data.id].creater) {
-      globalUsers[data.id].creater = false;
-      delete creater[data.key];
-      let users = userRoom.get(data.key);
-      users[data.id].creater = false;
-      io.to(data.key).emit("update-users", userRoom.get(data.key));
-    }*/
   });
 
   socket.on("start-vote", (data) => {
     console.log("start-vote");
 
     let users = userRoom.get(data.key);
-    for (item in users) {
+    for (let item in users) {
       users[item].balance = -1;
     }
     userRoom.set(data.key, users);
