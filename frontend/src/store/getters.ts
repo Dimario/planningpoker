@@ -1,5 +1,5 @@
 import { GetterTree } from "vuex";
-import { State } from "./state";
+import { State } from "@/store/state";
 import { User } from "@/interfaces/User";
 
 export type Getters<S = State> = {

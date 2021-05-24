@@ -1,21 +1,30 @@
-const { v4: uuidv4 } = require("uuid");
+import { Socket } from "socket.io";
+
+import { v4 as uuidv4 } from "uuid";
 const express = require("express");
 const http = require("http");
 const app = express();
 const server = http.createServer(app).listen(3001);
 const io = require("socket.io")(server, { cors: { origin: "*" } });
-import { Events } from "../frontend/src/const";
-
-const userRoom = new Map(),
-  globalUsers = {},
-  globalSocketUsers = {},
-  creater = {};
+import { Events } from "@front/const";
 
 console.log("Start server");
 
-io.on("connection", (socket) => {
+type userIdType = ArrayLike<number> | string;
+
+interface UserInterface {
+  socket: string;
+  room: string | boolean;
+}
+
+const userRoom = new Map(),
+  globalUsers: { [key: string]: UserInterface } = {},
+  globalSocketUsers: { [key: string]: userIdType } = {},
+  creater: { [key: string]: userIdType } = {};
+
+io.on("connection", (socket: Socket) => {
   console.log("connect!");
-  const userid = String(socket.handshake.query.userid) || uuidv4();
+  const userid: userIdType = String(socket.handshake.query.userid) || uuidv4();
 
   //Отдаем пользователю id & socket.id
   socket.emit("set-user", {
@@ -167,7 +176,7 @@ io.on("connection", (socket) => {
   });
 });
 
-app.use(function (req, res, next) {
+app.use(function (req: any, res: any, next: any) {
   console.log("Time: %d", Date.now());
   next();
 });

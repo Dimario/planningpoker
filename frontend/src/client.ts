@@ -63,16 +63,12 @@ export function connection(user: User, router: Router, store: Store) {
     socket.on(Events.front.setUser, (user: { socket: string; id: string }) => {
       store.commit(Events.front.setUser, user);
     });
-    //Создание комнаты
-    bus.$on(Events.create.room, () => socket.emit(Events.create.room, user.id));
     //Ответ после создания комнаты и автомаческий переход в комнату
     socket.on(Events.create.room, (key: string) => router.push(`/r/${key}`));
     //Получаем пользователей комнаты
     socket.on(Events.server.updateUsers, (users: User[] | []) => {
-      console.log(Events.server.updateUsers, users);
       store.commit(Events.front.setUsers, users);
     });
-
     socket.on(Events.poker.startVoteServer, () => {
       bus.$emit(Events.poker.startVoteServer);
     });
@@ -81,6 +77,7 @@ export function connection(user: User, router: Router, store: Store) {
     });
   });
 
+  bus.$on(Events.create.room, () => socket.emit(Events.create.room, user.id));
   bus.$on(Events.get.room.id, (key: string) => joinRoom(key));
   bus.$on(Events.poker.setBalance, (card: string) => setBalance(card));
   bus.$on(Events.poker.promotionAdmin, promotionAdmin);
