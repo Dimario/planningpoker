@@ -34,7 +34,7 @@ services:
     ports:
         - ${NODE_PORT}:3000
         - 3001:3001
-    command: /bin/sh -c "cd /data/frontend && npm i && node node_modules/esbuild/install.js && npm run build && cd /data/server/ && npm i && node index.js"
+    command: /bin/sh -c "cd /data/frontend && npm i && node node_modules/esbuild/install.js && npm run build && cd /data/server/ && npm i && npm run build && cd /data/server/dist/ && node index.js"
     expose:
       - "3000"
       - "3001"
