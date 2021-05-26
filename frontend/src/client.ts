@@ -75,6 +75,7 @@ export function connection(user: User, router: Router, store: Store) {
     socket.on(Events.poker.endVoteAnswer, () => {
       bus.$emit(Events.poker.endVoteAnswer);
     });
+    socket.on(Events.server.sendError, (e: string) => console.error(e));
   });
 
   bus.$on(Events.create.room, () => socket.emit(Events.create.room, user.id));

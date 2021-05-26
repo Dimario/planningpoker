@@ -10,6 +10,7 @@ export const Events = {
   server: {
     joinRoom: "join-in-room",
     updateUsers: "update-users",
+    sendError: "send-error",
   },
   statusBar: {
     statusChange: "status-change",
