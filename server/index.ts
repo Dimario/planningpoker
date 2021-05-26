@@ -6,7 +6,7 @@ const http = require("http");
 const app = express();
 const server = http.createServer(app).listen(3001);
 const io = require("socket.io")(server, { cors: { origin: "*" } });
-import { Events } from "@front/const";
+import { Events } from "../frontend/src/const";
 
 console.log("Start server");
 

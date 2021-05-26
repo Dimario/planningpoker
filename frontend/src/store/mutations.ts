@@ -1,6 +1,6 @@
-import { User, SetUser } from "@/interfaces/User";
+import { User, SetUser } from "../interfaces/User";
 import { MutationTree } from "vuex";
-import { State } from "@/store/state";
+import { State } from "./state";
 
 export enum MutationTypes {
   setName = "set-name",

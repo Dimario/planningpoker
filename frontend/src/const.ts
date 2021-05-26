@@ -1,4 +1,4 @@
-import { MutationTypes } from "@/store/mutations";
+import { MutationTypes } from "./store/mutations";
 
 export const Events = {
   create: {

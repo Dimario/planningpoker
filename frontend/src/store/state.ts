@@ -1,4 +1,4 @@
-import { User } from "@/interfaces/User";
+import { User } from "../interfaces/User";
 
 interface stateInterface {
   counter: number;
