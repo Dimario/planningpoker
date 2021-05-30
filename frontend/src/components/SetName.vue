@@ -9,6 +9,7 @@
 <script lang="ts">
 import { computed, ref } from "vue";
 import { Store, useStore } from "@/store/store";
+import { Events } from "@/const";
 
 export default {
   name: "SetName",
@@ -25,7 +26,7 @@ export default {
     });
 
     const setName = () => {
-      store.commit("setName", newName.value);
+      store.commit(Events.front.setName, newName.value);
       name.value = store.getters.name;
       localStorage["name"] = name.value;
     };

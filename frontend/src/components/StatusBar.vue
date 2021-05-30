@@ -2,18 +2,23 @@
   <div class="statusBar">
     <div>Статус: {{ status }}</div>
     <div>Комната: {{ room }}</div>
+    <div @click="editName">{{ name }} <span>✏️</span></div>
   </div>
 </template>
 <script lang="ts">
 import bus from "@/lib/bus";
 import { Events } from "@/const";
 import { ref } from "vue";
+import { Store, useStore } from "@/store/store";
 
 export default {
   name: "StatusBar",
   setup() {
+    const store: Store = useStore();
     const status = ref<string>("");
     const room = ref<string>("");
+    const name = ref<string>("");
+    name.value = store.getters.name;
 
     bus.$on(
       Events.statusBar.statusChange,
@@ -21,7 +26,11 @@ export default {
     );
     bus.$on(Events.statusBar.roomChange, (text: string) => (room.value = text));
 
-    return { status, room };
+    const editName = () => {
+      bus.$emit(Events.statusBar.editName, true);
+    };
+
+    return { status, room, name, editName };
   },
 };
 </script>

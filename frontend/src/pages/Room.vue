@@ -2,6 +2,7 @@
   <div class="secondText">Стол</div>
 
   <div class="users">
+    <div v-if="!countTable">Пустой стол</div>
     <div v-for="item in users" :key="item.id">
       <div class="user" v-if="item.balance != '-1'">
         <div class="balance">
@@ -78,11 +79,27 @@ export default {
     const cards = ["0", "1", "2", "3", "5", "8", "13", "21", "?", "x"];
     const choiseCard = ref<string>("");
     const setChoiseCard = (card: string) => {
-      if (choiseCard.value != card) {
+      if (choiseCard.value === card) {
+        choiseCard.value = "";
+        bus.$emit(Events.poker.setBalance, String("x"));
+      } else {
         choiseCard.value = card;
         bus.$emit(Events.poker.setBalance, String(card));
       }
     };
+
+    const countTable = computed<boolean>(() => {
+      let count: number = 0;
+      for (let item in users.value) {
+        if (users.value[item].balance === "?") {
+          return;
+        }
+
+        if (Number(users.value[item].balance) > 0) count++;
+      }
+
+      return Boolean(count);
+    });
 
     onMounted(() => {
       bus.$emit(Events.get.room.id, route.params.key);
@@ -91,7 +108,6 @@ export default {
 
     const me = computed<User>(() => {
       if (users.value && userid.value) {
-        //@ts-ignore
         return users.value[userid.value];
       }
 
@@ -147,6 +163,7 @@ export default {
       roomSettingsViewBalance,
       startVote,
       endVote,
+      countTable,
     };
   },
 };

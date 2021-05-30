@@ -15,6 +15,7 @@ export const Events = {
   statusBar: {
     statusChange: "status-change",
     roomChange: "room-change",
+    editName: "edit-name",
   },
   get: {
     room: {

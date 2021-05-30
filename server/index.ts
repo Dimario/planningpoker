@@ -8,8 +8,6 @@ const server = http.createServer(app).listen(3001);
 const io = require("socket.io")(server, { cors: { origin: "*" } });
 import { Events } from "../frontend/src/const";
 
-console.log("Start server");
-
 type userIdType = string;
 type userName = string;
 type usersTmp = { [key: string]: User };

@@ -13,7 +13,8 @@ import { Events, StatusSocket } from "@/const";
 import { computed, onMounted, ref, reactive } from "vue";
 import { Store, useStore } from "@/store/store";
 import { connection } from "@/client";
-import { useRouter } from "vue-router";
+import { Router, useRouter } from "vue-router";
+import LS from "@/lib/localstorage";
 
 export default {
   name: "App",
@@ -46,9 +47,14 @@ export default {
       bus.$on(Events.get.room.id, (key: string) => (room.value = key));
       bus.$emit(Events.statusBar.statusChange, StatusSocket.connection);
       bus.$emit(Events.statusBar.roomChange, "Отсутствует");
+      bus.$on(Events.statusBar.editName, (show: boolean) => {
+        showName.value = show;
+      });
 
       connection(user, router, store);
     });
+
+    new LS();
 
     return { name, room, showName, show };
   },
