@@ -2,7 +2,7 @@ const path = require("path");
 
 module.exports = {
   target: "node",
-  mode: "production",
+  mode: "development",
   entry: "./index.ts",
   module: {
     rules: [

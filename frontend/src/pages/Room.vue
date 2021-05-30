@@ -129,10 +129,10 @@ export default {
 
     bus.$on(Events.poker.startVoteServer, () => {
       choiseCard.value = "-1";
-      useStore().commit("roomSettingsViewBalance", false);
+      useStore().commit(Events.front.roomSettingsViewBalance, false);
     });
     bus.$on(Events.poker.endVoteAnswer, () => {
-      useStore().commit("roomSettingsViewBalance", true);
+      useStore().commit(Events.front.roomSettingsViewBalance, true);
     });
 
     return {

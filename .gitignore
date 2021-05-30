@@ -4,13 +4,13 @@ node_modules
 /public
 
 # node_modules
-/node_modules
+/frontend/node_modules
 /server/node_modules
 
 # env files
-.env
 .env.local
 .env.*.local
+.env
 
 # Log files
 npm-debug.log*
