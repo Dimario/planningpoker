@@ -76,7 +76,7 @@ export default {
       return useStore().getters.roomSettingsViewBalance;
     });
     const users = computed<User[] | []>(() => store.getters.users);
-    const cards = ["0", "1", "2", "3", "5", "8", "13", "21", "?", "x"];
+    const cards = ["0", "1", "2", "3", "5", "8", "13", "21", "?"];
     const choiseCard = ref<string>("");
     const setChoiseCard = (card: string) => {
       if (choiseCard.value === card) {
