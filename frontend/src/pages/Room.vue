@@ -92,7 +92,7 @@ export default {
       let count: number = 0;
       for (let item in users.value) {
         if (users.value[item].balance === "?") {
-          return;
+          continue;
         }
 
         if (Number(users.value[item].balance) > 0) count++;
@@ -108,6 +108,7 @@ export default {
 
     const me = computed<User>(() => {
       if (users.value && userid.value) {
+        //@ts-ignore
         return users.value[userid.value];
       }
 
