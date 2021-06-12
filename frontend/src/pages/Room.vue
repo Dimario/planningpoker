@@ -1,46 +1,44 @@
 <template>
-  <div class="secondText">Стол</div>
-
-  <div class="users">
-    <div v-if="!countTable">Пустой стол</div>
-    <div v-for="item in users" :key="item.id">
-      <div class="user" v-if="item.balance != '-1'">
-        <div class="balance">
-          <template v-if="roomSettingsViewBalance">
-            {{ item.balance }}
-          </template>
-          <template v-else> * </template>
+  <div class="h25 table">
+    <div v-if="!votedUsersCount" class="emptyTable">Пустой стол</div>
+    <div class="users">
+      <div v-for="item in votedUsers" :key="item.id" class="user">
+        <div class="balance" v-if="roomSettingsViewBalance">
+          {{ item.balance }}
         </div>
-        <div class="name">{{ item.name }}</div>
-      </div>
-    </div>
-  </div>
-  <div class="secondText">Участники</div>
-  <div class="users">
-    <div v-for="item in users" :key="item.id">
-      <div class="user" v-if="item.balance == '-1'">
+        <div class="balance" v-else>*</div>
         <div class="name">{{ item.name }}</div>
       </div>
     </div>
   </div>
 
-  <div v-if="me && me.creater">
-    <div class="secondText">Действия</div>
-
-    <div class="actions">
-      <div class="action" @click="startVote">Начать голосование</div>
-      <div class="action" @click="endVote">Закончить голосование</div>
-      <div class="action" @click="refuseAdmin">
-        Не хочу быть администратором стола
+  <div class="h25">
+    <div class="h25-title">Участники</div>
+    <div class="users">
+      <div v-for="item in notVotedUsers" :key="item.id" class="user">
+        <div class="name">{{ item.name }}</div>
       </div>
     </div>
   </div>
-  <div v-else>
-    <div class="secondText">Ваш выбор</div>
-    <div class="cards-wrapper">
-      <div class="cards">
-        <div v-for="(item, index) in cards" :key="`card-${index}`">
+
+  <div class="h25">
+    <template v-if="me && me.creater">
+      <div class="h25-title">Действия</div>
+
+      <div class="actions">
+        <div class="action" @click="startVote">Начать голосование</div>
+        <div class="action" @click="endVote">Закончить голосование</div>
+        <div class="action" @click="refuseAdmin">
+          Не хочу быть администратором стола
+        </div>
+      </div>
+    </template>
+    <template v-else>
+      <div class="cards-wrapper">
+        <div class="cards">
           <div
+            v-for="(item, index) in cards"
+            :key="`card-${index}`"
             class="card"
             :class="{ active: item === choiseCard }"
             @click="setChoiseCard(item)"
@@ -49,11 +47,7 @@
           </div>
         </div>
       </div>
-    </div>
-  </div>
-  <div v-if="!checkAdmin">
-    У стола нету администратора!
-    <div @click="promotion" class="promotion">стать администратором</div>
+    </template>
   </div>
 </template>
 <script lang="ts">
@@ -62,7 +56,7 @@ import { Events, StatusSocket } from "@/const";
 import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "@/store/store";
-import { User } from "@/interfaces/User";
+import { User, Users } from "@/interfaces/User";
 
 export default {
   name: "Room",
@@ -75,8 +69,13 @@ export default {
     const roomSettingsViewBalance = computed<boolean>(() => {
       return useStore().getters.roomSettingsViewBalance;
     });
-    const users = computed<User[] | []>(() => store.getters.users);
-    const cards = ["0", "1", "2", "3", "5", "8", "13", "21", "?"];
+    const users = computed<Users>(() => store.getters.users);
+    const votedUsers = computed<Users>(() => store.getters.votedUsers);
+    const notVotedUsers = computed<Users>(() => store.getters.notVotedUsers);
+    const votedUsersCount = computed<number>(
+      () => store.getters.votedUsersCount
+    );
+    const cards = ["1", "2", "3", "5", "8", "13", "21", "?"];
     const choiseCard = ref<string>("");
     const setChoiseCard = (card: string) => {
       if (choiseCard.value === card) {
@@ -87,20 +86,6 @@ export default {
         bus.$emit(Events.poker.setBalance, String(card));
       }
     };
-
-    const countTable = computed<boolean>(() => {
-      let count: number = 0;
-      for (let item in users.value) {
-        if (users.value[item].balance === "?") {
-          continue;
-        }
-
-        if (Number(users.value[item].balance) > 0) count++;
-      }
-
-      return Boolean(count);
-    });
-
     onMounted(() => {
       bus.$emit(Events.get.room.id, route.params.key);
       bus.$emit(Events.statusBar.roomChange, route.params.key);
@@ -108,7 +93,6 @@ export default {
 
     const me = computed<User>(() => {
       if (users.value && userid.value) {
-        //@ts-ignore
         return users.value[userid.value];
       }
 
@@ -164,7 +148,9 @@ export default {
       roomSettingsViewBalance,
       startVote,
       endVote,
-      countTable,
+      votedUsersCount,
+      votedUsers,
+      notVotedUsers,
     };
   },
 };
@@ -182,8 +168,7 @@ export default {
 }
 
 .users {
-  min-height: 130px;
-  margin: 15px 0;
+  height: 100%;
 }
 
 .action {
@@ -229,20 +214,15 @@ export default {
   background: #fff;
   padding: 5px;
   width: 130px;
-  height: 130px;
+  height: 100%;
   border-radius: 15px;
   margin-right: 15px;
   box-sizing: border-box;
   transition: background 0.3s ease-out;
 }
 
-.user:hover {
-  background: #d8d8d8;
-}
-
 .cards-wrapper {
   overflow-x: auto;
-  margin: 15px 0;
 }
 .card {
   background: #fff;

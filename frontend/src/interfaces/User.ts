@@ -5,6 +5,8 @@ export interface User {
   creater: boolean;
 }
 
+export type Users = { [key: string]: User };
+
 export interface SetUser {
   socket: string;
   id: string;

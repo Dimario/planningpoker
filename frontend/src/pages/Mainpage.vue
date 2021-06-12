@@ -25,8 +25,3 @@ export default {
   },
 };
 </script>
-<style scoped>
-.secondText {
-  margin: 50px 0;
-}
-</style>

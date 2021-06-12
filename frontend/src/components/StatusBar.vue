@@ -2,7 +2,7 @@
   <div class="statusBar">
     <div>Статус: {{ status }}</div>
     <div>Комната: {{ room }}</div>
-    <div>{{ name }} <span>✏️</span></div>
+    <div>{{ name }} <span @click="editName">✏️</span></div>
   </div>
 </template>
 <script lang="ts">

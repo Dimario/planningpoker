@@ -419,3 +419,118 @@ input{
     background: transparent;
     padding: 0;
 }
+
+.main {
+    padding: 50px;
+    box-sizing: border-box;
+    height: 100vh;
+    max-height: 100vh;
+}
+
+.secondText {
+    margin: 50px 0;
+}
+
+.table{
+    background: #d8d8d8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+}
+
+.h25{
+    height: 32%;
+    position: relative;
+}
+
+.main .h25:nth-child(2){
+    margin: 2% 0;
+}
+
+.table .user{
+    height: 80%;
+}
+
+.table .users{
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+
+.h25-title{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #d8d8d8;
+    text-transform: uppercase;
+    z-index: -1;
+}
+
+.emptyTable{
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #494949;
+    text-transform: uppercase;
+}
+
+.user:empty{
+    display: none;
+}
+
+
+@media screen and (max-width: 699px) {
+    body{
+        font-size: 15px;
+    }
+
+    .main{
+        width: 100%;
+        box-sizing: border-box;
+        padding: 25px;
+    }
+
+    h1{
+        margin: 0 0 20px 0;
+    }
+
+    .statusBar{
+        display: none !important;
+    }
+
+    button{
+        width: 100%;
+    }
+
+    .input-row input{
+        margin: 0 0 20px 0;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .secondText{
+        margin: 20px 0;
+    }
+
+    .card{
+        font-size: 2em;
+        width: 70px;
+    }
+
+    .users{
+        min-height: 100px;
+    }
+
+    .user{
+        width: 100px;
+        height: 100px;
+    }
+}

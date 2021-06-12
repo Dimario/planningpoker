@@ -1,6 +1,6 @@
 <template>
   <section class="main">
-    <SetName v-if="showName || show" />
+    <SetName v-if="showName || show" :isEdit="showName" />
     <router-view v-else />
   </section>
   <StatusBar />
@@ -60,8 +60,3 @@ export default {
   },
 };
 </script>
-<style scoped>
-.main {
-  padding: 50px;
-}
-</style>
