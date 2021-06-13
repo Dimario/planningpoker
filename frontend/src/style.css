@@ -486,6 +486,96 @@ input{
     display: none;
 }
 
+.cards,
+.users,
+.actions {
+    display: flex;
+}
+
+.actions {
+    min-height: 130px;
+    margin: 15px 0;
+}
+
+.users {
+    height: 100%;
+}
+
+.action {
+    padding: 15px;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border-radius: 15px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 0.9em;
+    word-break: break-word;
+    margin-right: 15px;
+    transition: background 0.3s ease-out;
+}
+
+.action:hover {
+    background: #d8d8d8;
+}
+
+.user .balance {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+.user .name {
+    clear: both;
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 100%;
+    text-overflow: ellipsis;
+    text-align: center;
+}
+
+.user {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background: #fff;
+    padding: 5px;
+    width: 130px;
+    height: 100%;
+    border-radius: 15px;
+    margin-right: 15px;
+    box-sizing: border-box;
+    transition: background 0.3s ease-out;
+}
+
+.cards-wrapper {
+    overflow-x: auto;
+}
+.card {
+    background: #fff;
+    font-size: 3em;
+    font-weight: bold;
+    padding: 25px 0px;
+    margin-right: 15px;
+    border-radius: 15px;
+    width: 100px;
+    text-align: center;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+.card.active {
+    background: #4cbdff;
+    color: #fff;
+}
+.promotion {
+    display: inline-block;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 
 @media screen and (max-width: 699px) {
     body{

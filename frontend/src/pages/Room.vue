@@ -1,24 +1,16 @@
 <template>
   <div class="h25 table">
     <div v-if="!votedUsersCount" class="emptyTable">Пустой стол</div>
-    <div class="users">
-      <div v-for="item in votedUsers" :key="item.id" class="user">
-        <div class="balance" v-if="roomSettingsViewBalance">
-          {{ item.balance }}
-        </div>
-        <div class="balance" v-else>*</div>
-        <div class="name">{{ item.name }}</div>
-      </div>
-    </div>
+    <UserList
+      :users="votedUsers"
+      need-show-balance
+      :balance="roomSettingsViewBalance"
+    />
   </div>
 
   <div class="h25">
     <div class="h25-title">Участники</div>
-    <div class="users">
-      <div v-for="item in notVotedUsers" :key="item.id" class="user">
-        <div class="name">{{ item.name }}</div>
-      </div>
-    </div>
+    <UserList :users="notVotedUsers" />
   </div>
 
   <div class="h25">
@@ -57,9 +49,11 @@ import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "@/store/store";
 import { User, Users } from "@/interfaces/User";
+import UserList from "@/components/UserList.vue";
 
 export default {
   name: "Room",
+  components: { UserList },
   setup() {
     bus.$emit(Events.statusBar.statusChange, StatusSocket.joinRoom);
     const route = useRoute();
@@ -120,13 +114,8 @@ export default {
         bus.$emit(Events.poker.refuseAdmin);
       }
     };
-    const startVote = () => {
-      bus.$emit(Events.poker.startVote);
-    };
-
-    const endVote = () => {
-      bus.$emit(Events.poker.endVote);
-    };
+    const startVote = () => bus.$emit(Events.poker.startVote);
+    const endVote = () => bus.$emit(Events.poker.endVote);
 
     bus.$on(Events.poker.startVoteServer, () => {
       choiseCard.value = "-1";
@@ -155,94 +144,3 @@ export default {
   },
 };
 </script>
-<style scoped>
-.cards,
-.users,
-.actions {
-  display: flex;
-}
-
-.actions {
-  min-height: 130px;
-  margin: 15px 0;
-}
-
-.users {
-  height: 100%;
-}
-
-.action {
-  padding: 15px;
-  width: 100px;
-  height: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #fff;
-  border-radius: 15px;
-  text-align: center;
-  cursor: pointer;
-  font-size: 0.9em;
-  word-break: break-word;
-  margin-right: 15px;
-  transition: background 0.3s ease-out;
-}
-
-.action:hover {
-  background: #d8d8d8;
-}
-
-.user .balance {
-  font-size: 1.5em;
-  font-weight: bold;
-}
-.user .name {
-  clear: both;
-  display: inline-block;
-  overflow: hidden;
-  white-space: nowrap;
-  width: 100%;
-  text-overflow: ellipsis;
-  text-align: center;
-}
-
-.user {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  background: #fff;
-  padding: 5px;
-  width: 130px;
-  height: 100%;
-  border-radius: 15px;
-  margin-right: 15px;
-  box-sizing: border-box;
-  transition: background 0.3s ease-out;
-}
-
-.cards-wrapper {
-  overflow-x: auto;
-}
-.card {
-  background: #fff;
-  font-size: 3em;
-  font-weight: bold;
-  padding: 25px 0px;
-  margin-right: 15px;
-  border-radius: 15px;
-  width: 100px;
-  text-align: center;
-  box-sizing: border-box;
-  cursor: pointer;
-}
-.card.active {
-  background: #4cbdff;
-  color: #fff;
-}
-.promotion {
-  display: inline-block;
-  text-decoration: underline;
-  cursor: pointer;
-}
-</style>
