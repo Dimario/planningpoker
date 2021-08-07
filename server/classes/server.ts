@@ -6,6 +6,7 @@ import { IUser, UserId } from "../interfaces/iuser";
 import { v4 as uuidv4 } from "uuid";
 import { RoomKey } from "../interfaces/iroom";
 import { IEnter } from "../interfaces/interfaces";
+import { FindCursor } from "mongodb";
 
 export class Server {
   private socket: Socket;
@@ -20,24 +21,31 @@ export class Server {
     this.room = room;
   }
 
-  public createRoom(userid: UserId) {
+  public async createRoom(userid: UserId) {
     try {
       let key = uuidv4() as RoomKey;
       this.socket.emit(Events.create.room, key);
-      this.user.create(userid, key);
-      this.room.add(key);
+
+      await this.room.create(key);
+      await this.user.changeAdmin(userid, true);
+      await this.user.enter(userid, key);
+      await this.updateUsers(key);
     } catch (e) {
       this.sendError(e);
     }
   }
 
-  public enterRoom(data: IEnter) {
+  public async enterRoom(data: IEnter) {
     try {
       if (!data.id || !data.key) {
         return false;
       }
 
-      this.user.add({
+      // this.user.enter(this.socket.id);
+
+      console.log("socket.id", data.id);
+
+      await this.user.add({
         socketId: data.id,
         room: data.key,
         name: data.name,
@@ -47,93 +55,56 @@ export class Server {
 
       this.socket.join(data.key);
 
-      this.io
-        .to(data.key)
-        .emit(Events.server.updateUsers, this.getRoomUsers(data.key));
+      this.updateUsers(data.key);
     } catch (e) {
       this.sendError(e);
     }
   }
 
-  public changeBalance(data: IEnter) {
+  public async changeBalance(data: IEnter) {
     try {
-      if (userRoom.get(data.key)) {
-        let users: usersTmp = {};
-        users = userRoom.get(data.key);
-        users[data.id]["balance"] = data.balance;
-        userRoom.set(data.key, users);
-      }
-
-      io.to(data.key).emit(Events.server.updateUsers, userRoom.get(data.key));
+      await this.user.changeBalance(data.id, data.balance);
+      await this.updateUsers(data.key);
     } catch (e) {
-      sendError(e);
+      this.sendError(e);
     }
   }
 
   public promotionAdmin(data: IEnter) {
     try {
-      let users: usersTmp = userRoom.get(data.key);
-
-      let logic = false;
-      for (let item in users) {
-        if (users[item].creater) {
-          logic = true;
-        }
-      }
-
-      if (!logic && users && users[data.id]) {
-        users[data.id]["creater"] = true;
-        userRoom.set(data.key, users);
-        creater[data.key] = data.id;
-        globalUsers[data.id].creator = true;
-        io.to(data.key).emit(Events.server.updateUsers, userRoom.get(data.key));
-      }
+      this.user.changeAdmin(data.id, true);
+      this.updateUsers(data.key);
     } catch (e) {
-      sendError(e);
+      this.sendError(e);
     }
   }
 
   public refuseAdmin(data: IEnter) {
     try {
-      let users: usersTmp = userRoom.get(data.key);
-
-      if (users && users[data.id]) {
-        users[data.id].creater = false;
-
-        if (creater[data.key]) {
-          delete creater[data.key];
-        }
-
-        userRoom.set(data.key, users);
-        io.to(data.key).emit(Events.server.updateUsers, userRoom.get(data.key));
-      }
+      this.user.changeAdmin(data.id, false);
+      this.updateUsers(data.key);
     } catch (e) {
-      sendError(e);
+      this.sendError(e);
     }
   }
 
-  /**
-   * Старт голосования
-   * @param data
-   */
-  public startVote(data: IEnter) {
+  public async startVote(data: IEnter): Promise<void> {
     try {
-      let users = userRoom.get(data.key);
-      for (let item in users) {
-        users[item].balance = -1;
-      }
-      userRoom.set(data.key, users);
-      this.io
-        .to(data.key)
-        .emit(Events.server.updateUsers, userRoom.get(data.key));
+      await this.user.resetBalance(data.key);
+      this.updateUsers(data.key);
       this.io.to(data.key).emit(Events.poker.startVoteServer);
     } catch (e) {
       this.sendError(e);
     }
   }
 
-  public disconnect() {
+  public async userDisconnect(socket: any) {
     try {
+      console.log("disconnect", this.socket.id, socket.id);
+      // console.log("disconnect", this.socket.id);
+      await this.user.deleteUser(this.socket.id);
+      /*
+      //TODO: GGWP
       //Получаем userid и удаляем его из globalSocketUsers
       let useridtmp = globalSocketUsers[socket.id];
       delete globalSocketUsers[socket.id];
@@ -155,24 +126,23 @@ export class Server {
           userRoom.get(usertmp.room)
         );
       }
+       */
     } catch (e) {
-      sendError(e);
+      this.sendError(e);
     }
   }
 
-  /**
-   * Конец голосования
-   * @param data
-   */
   public endVote(data: IEnter) {
     this.io.to(data.key).emit(Events.poker.endVoteAnswer);
   }
 
-  public async getRoomUsers(roomId: RoomKey): Promise<IUser[]> {
-    return await this.user.find({ room: roomId });
+  sendError(error: Error): void {
+    this.socket.emit(Events.server.sendError, error);
   }
 
-  private sendError(error: Error): void {
-    this.socket.emit(Events.server.sendError, error);
+  private async updateUsers(room: RoomKey): Promise<void> {
+    this.io
+      .to(room)
+      .emit(Events.server.updateUsers, await this.user.getRoomUsers(room));
   }
 }

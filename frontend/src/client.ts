@@ -5,7 +5,7 @@ import { Router } from "vue-router";
 import { Store } from "@/store/store";
 import { User, Users } from "@/interfaces/User";
 
-const server = `http://${location.hostname}:3001`;
+const server = `http://${location.hostname}:3002`;
 
 export function connection(user: User, router: Router, store: Store) {
   const socket = io(`${server}?userid=${user.id}`);
@@ -67,6 +67,7 @@ export function connection(user: User, router: Router, store: Store) {
     socket.on(Events.create.room, (key: string) => router.push(`/r/${key}`));
     //Получаем пользователей комнаты
     socket.on(Events.server.updateUsers, (users: Users) => {
+      console.log(users);
       store.commit(Events.front.setUsers, users);
     });
     socket.on(Events.poker.startVoteServer, () => {

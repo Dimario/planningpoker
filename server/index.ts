@@ -5,15 +5,14 @@ import { v4 as uuidv4 } from "uuid";
 const express = require("express");
 const http = require("http");
 const app = express();
-const server = http.createServer(app).listen(3001);
+const server = http.createServer(app).listen(3002);
 const io = require("socket.io")(server, { cors: { origin: "*" } });
 import { Events } from "../frontend/src/const";
 
-import { MongoClient, Db, Collection, Callback } from "mongodb";
-import { IUser, UserId } from "./interfaces/iuser";
+import { MongoClient, Db } from "mongodb";
+import { UserId } from "./interfaces/iuser";
 import { User } from "./classes/user";
 import { Room } from "./classes/room";
-import { RoomKey } from "./interfaces/iroom";
 import { Server } from "./classes/server";
 import { IEnter } from "./interfaces/interfaces";
 
@@ -41,35 +40,44 @@ mongoConnection();
 
 console.log("Start server");
 
-type userName = string;
-type usersTmp = { [key: string]: IUser };
-type RoomId = string;
-
 async function mainWay(db: Db) {
   const USER = new User(db.collection("users"));
   const ROOM = new Room(db.collection("rooms"));
 
-  // USER.add({
-  //   socketId: "test",
-  //   room: "1",
-  //   balance: -1,
-  //   creator: false,
-  //   name: "test",
-  // });
-  // console.log(await USER.get("test"));
-  // console.log(await USER.get("123"));
+  await USER.drop();
+  await ROOM.drop();
 
-  io.on("connection", (socket: Socket) => {
+  /*await USER.drop();
+  await ROOM.drop();
+
+  await USER.add({
+    socketId: "test2",
+    room: "1",
+    balance: -1,
+    creator: false,
+    name: "test",
+  });
+  await USER.add({
+    socketId: "test3",
+    room: "1",
+    balance: 999,
+    creator: false,
+    name: "test",
+  });
+
+  await USER.changeBalance("test2", 100);
+  console.log(await USER.getRoomUsers("1"));
+  await USER.resetBalance("1");
+  console.log(await USER.getRoomUsers("1"));*/
+
+  io.on("connection", async (socket: Socket) => {
     const SERVER = new Server(io, socket, USER, ROOM);
     const userid: UserId = String(socket.handshake.query.userid) || uuidv4();
 
-    //Отдаем пользователю id & socket.id
     socket.emit("set-user", {
       socket: socket.id,
       id: userid,
     });
-
-    USER.add({ socketId: socket.id, room: false, creator: false, balance: -1 });
 
     //Событие создание комнаты
     socket.on(Events.create.room, (userid: UserId) =>
@@ -101,7 +109,11 @@ async function mainWay(db: Db) {
     socket.on(Events.poker.endVote, (data: IEnter) => SERVER.endVote(data));
 
     //Отключение
-    socket.on("disconnect", () => SERVER.disconnect());
+    socket.on("disconnect", () => {
+      console.log(socket.id);
+      console.log(socket.client);
+      SERVER.userDisconnect(socket);
+    });
   });
 }
 

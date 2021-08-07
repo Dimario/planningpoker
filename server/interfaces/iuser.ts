@@ -4,6 +4,6 @@ export interface IUser {
   socketId: UserId;
   room: string | boolean;
   creator: boolean;
-  balance: number;
+  balance: number | string;
   name?: string;
 }

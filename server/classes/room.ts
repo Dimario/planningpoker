@@ -2,14 +2,14 @@ import { Callback, Collection } from "mongodb";
 import { IRoom, RoomKey } from "../interfaces/iroom";
 
 export class Room {
-  private collection: Collection;
+  public collection: Collection;
 
   constructor(collection: Collection) {
     this.collection = collection;
   }
 
-  public add(roomId: RoomKey): void {
-    this.collection.insertOne({ room: roomId, users: [] });
+  public async create(roomId: RoomKey): Promise<void> {
+    await this.collection.insertOne({ room: roomId });
   }
 
   public async get(roomId: RoomKey): Promise<IRoom> {
@@ -20,11 +20,7 @@ export class Room {
     this.collection.findOne({ room: roomId }, callback);
   }
 
-  public updateRoom(roomId: RoomKey) {
-    this.getItem(roomId, (err: Error, item: any) => {
-      item.users.push({ test: 1, b: 2, c: 3 });
-
-      this.collection.replaceOne({ room: roomId }, item);
-    });
+  public drop() {
+    this.collection.deleteMany({});
   }
 }

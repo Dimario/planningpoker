@@ -1,15 +1,10 @@
-# planningpoker
+# Easy Planning Poker
 
-## Vue 3 + Typescript + Vite
+## Vue 3 + Typescript + Vite + MongoDB + Docker
 
-Описание будет когда нибудь потом
+### Step 1:
+````
+git clone https://github.com/Dimario/planningpoker.git
+````
 
-
-
-Пример .env файла 
-- PROJECT_NAME=planningpoker
-- WEBAPP_PORT=80 FRONTEND_PORT=3500
-- NGINX_TIMEOUT=3600
-- NGINX_PORT=90
-- NGINX_HOST=localhost
-- NODE_PORT=3000
+### Step 2: 
