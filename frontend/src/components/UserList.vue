@@ -1,8 +1,8 @@
 <template>
-  <div class="users">
-    <div v-for="item in users" :key="item.id" class="user">
-      <template v-if="needShowBalance">
-        <div class="balance" v-if="balance">
+  <div class="users" v-if="$props.users">
+    <div v-for="item in $props.users" :key="item.id" class="user">
+      <template v-if="$props.needShowBalance">
+        <div class="balance" v-if="$props.balance">
           {{ item.balance }}
         </div>
         <div class="balance" v-else>*</div>

@@ -1,7 +1,9 @@
 <template>
   <section class="main">
-    <SetName v-if="showName || show" :isEdit="showName" />
-    <router-view v-else />
+    <SetName v-if="shouldShowSetName" :isEdit="showName" />
+    <div :class="{ hide: shouldShowSetName }" style="height: 100%">
+      <router-view />
+    </div>
   </section>
   <StatusBar />
 </template>
@@ -15,6 +17,10 @@ import { Store, useStore } from "@/store/store";
 import { connection } from "@/client";
 import { Router, useRouter } from "vue-router";
 import LS from "@/lib/localstorage";
+
+const KEY_ESCAPE = "Escape";
+const KEY_ARROW_RIGHT = "ArrowRight";
+const KEY_ARROW_LEFT = "ArrowLeft";
 
 export default {
   name: "App",
@@ -39,9 +45,13 @@ export default {
     });
     const room = ref<string>();
     const showName = ref<boolean>(false);
-    const show = computed(() => {
+    const show = computed<boolean>(() => {
       return name.value.length < 3;
     });
+
+    const shouldShowSetName = computed<boolean>(
+      () => showName.value || show.value
+    );
 
     onMounted(() => {
       bus.$on(Events.get.room.id, (key: string) => (room.value = key));
@@ -52,11 +62,24 @@ export default {
       });
 
       connection(user, router, store);
+
+      window.addEventListener("keyup", (event: KeyboardEvent) => {
+        event.code === KEY_ESCAPE ? bus.$emit(Events.front.keyUpEsc) : "";
+        event.code === KEY_ARROW_RIGHT
+          ? bus.$emit(Events.front.keyUpRight)
+          : "";
+        event.code === KEY_ARROW_LEFT ? bus.$emit(Events.front.keyUpLeft) : "";
+      });
     });
 
     new LS();
 
-    return { name, room, showName, show };
+    return { name, room, showName, show, shouldShowSetName };
   },
 };
 </script>
+<style scoped>
+.hide {
+  display: none;
+}
+</style>

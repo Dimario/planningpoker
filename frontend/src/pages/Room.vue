@@ -40,6 +40,10 @@
         </div>
       </div>
     </template>
+    <div v-if="!checkAdmin">
+      В комнате отсутствует администратор.
+      <span @click="promotion">Стать администратором</span>
+    </div>
   </div>
 </template>
 <script lang="ts">
