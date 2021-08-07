@@ -3,7 +3,7 @@ import bus from "@/lib/bus";
 import { Events, StatusSocket } from "@/const";
 import { Router } from "vue-router";
 import { Store } from "@/store/store";
-import { User } from "@/interfaces/User";
+import { User, Users } from "@/interfaces/User";
 
 const server = `http://${location.hostname}:3001`;
 
@@ -15,7 +15,7 @@ export function connection(user: User, router: Router, store: Store) {
 
   //Событие захода в комнату
   const joinRoom = (roomKey: string) => {
-    console.log("Заходим в комнату", user);
+    console.log("Заходим");
     room = roomKey;
     socket.emit(Events.server.joinRoom, {
       key: roomKey,
@@ -66,7 +66,7 @@ export function connection(user: User, router: Router, store: Store) {
     //Ответ после создания комнаты и автомаческий переход в комнату
     socket.on(Events.create.room, (key: string) => router.push(`/r/${key}`));
     //Получаем пользователей комнаты
-    socket.on(Events.server.updateUsers, (users: User[] | []) => {
+    socket.on(Events.server.updateUsers, (users: Users) => {
       store.commit(Events.front.setUsers, users);
     });
     socket.on(Events.poker.startVoteServer, () => {

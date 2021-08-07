@@ -6,6 +6,9 @@ export const Events = {
   },
   front: {
     ...MutationTypes,
+    keyUpEsc: "key-up-esc",
+    keyUpRight: "key-up-right",
+    keyUpLeft: "key-up-left",
   },
   server: {
     joinRoom: "join-in-room",

@@ -4,6 +4,7 @@ module.exports = {
   target: "node",
   mode: "development",
   entry: "./index.ts",
+  watch: true,
   module: {
     rules: [
       {
