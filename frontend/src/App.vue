@@ -1,6 +1,6 @@
 <template>
   <section class="main">
-    <SetName v-if="shouldShowSetName" :isEdit="showName" />
+    <SetName v-if="shouldShowSetName" :is-edit="showName" />
     <div :class="{ hide: shouldShowSetName }" style="height: 100%">
       <router-view />
     </div>

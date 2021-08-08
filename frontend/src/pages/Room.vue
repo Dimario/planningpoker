@@ -14,7 +14,7 @@
   </div>
 
   <div class="h25">
-    <template v-if="me && me.creater">
+    <template v-if="me && me.creator">
       <div class="h25-title">Действия</div>
 
       <div class="actions">
@@ -52,7 +52,7 @@ import { Events, StatusSocket } from "@/const";
 import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "@/store/store";
-import { User, Users } from "@/interfaces/User";
+import { User } from "@/interfaces/User";
 import UserList from "@/components/UserList.vue";
 
 export default {
@@ -67,12 +67,10 @@ export default {
     const roomSettingsViewBalance = computed<boolean>(() => {
       return useStore().getters.roomSettingsViewBalance;
     });
-    const users = computed<Users>(() => store.getters.users);
-    const votedUsers = computed<Users>(() => store.getters.votedUsers);
-    const notVotedUsers = computed<Users>(() => store.getters.notVotedUsers);
-    const votedUsersCount = computed<number>(
-      () => store.getters.votedUsersCount
-    );
+    const users = computed<User[]>(() => store.getters.users);
+    const votedUsers = computed<User[]>(() => store.getters.votedUsers);
+    const notVotedUsers = computed<User[]>(() => store.getters.notVotedUsers);
+    const votedUsersCount = computed<number>(() => votedUsers.value.length);
     const cards = ["1", "2", "3", "5", "8", "13", "21", "?"];
     const choiseCard = ref<string>("");
     const setChoiseCard = (card: string) => {
@@ -91,25 +89,20 @@ export default {
 
     const me = computed<User>(() => {
       if (users.value && userid.value) {
-        return users.value[userid.value];
+        return users.value.filter(
+          (item: User) => item.socketId === userid.value
+        )[0];
       }
 
-      return { id: "", name: "", creater: false, balance: "" };
+      return { id: "", name: "", creator: false, balance: "", socketId: "" };
     });
 
     const checkAdmin = computed<boolean>(() => {
       if (users.value) {
-        let logic = false;
-        for (let item in users.value) {
-          if (users.value[item].creater) {
-            logic = true;
-          }
-        }
-
-        return logic;
+        return Boolean(users.value.filter((item: User) => item.creator).length);
       }
 
-      return true;
+      return false;
     });
 
     const promotion = () => bus.$emit(Events.poker.promotionAdmin);

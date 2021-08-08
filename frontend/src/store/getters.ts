@@ -1,14 +1,13 @@
 import { GetterTree } from "vuex";
 import { State } from "@/store/state";
-import { Users } from "@/interfaces/User";
+import { User } from "@/interfaces/User";
 
 export type Getters<S = State> = {
   name(state: S): string;
   socketUserId(state: S): string;
-  users(state: S): Users;
-  notVotedUsers(state: S): Users;
-  votedUsers(state: S): Users;
-  votedUsersCount(state: S): number;
+  users(state: S): User[];
+  notVotedUsers(state: S): User[];
+  votedUsers(state: S): User[];
   id(state: S): string;
   roomSettingsViewBalance(state: S): boolean;
 };
@@ -20,17 +19,14 @@ export const getters: GetterTree<State, State> & Getters = {
   socketUserId: (state): string => {
     return state.socketUserId || "";
   },
-  users: (state): Users => {
+  users: (state): User[] => {
     return state.users;
   },
-  notVotedUsers: (state): Users => {
+  notVotedUsers: (state): User[] => {
     return state.notVotedUsers;
   },
-  votedUsers: (state): Users => {
+  votedUsers: (state): User[] => {
     return state.votedUsers;
-  },
-  votedUsersCount: (state): number => {
-    return state.votedUsersCount;
   },
   id: (state): string => {
     return state.id;

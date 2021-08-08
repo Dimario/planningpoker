@@ -3,7 +3,7 @@ import bus from "@/lib/bus";
 import { Events, StatusSocket } from "@/const";
 import { Router } from "vue-router";
 import { Store } from "@/store/store";
-import { User, Users } from "@/interfaces/User";
+import { User } from "@/interfaces/User";
 
 const server = `http://${location.hostname}:3002`;
 
@@ -66,7 +66,7 @@ export function connection(user: User, router: Router, store: Store) {
     //Ответ после создания комнаты и автомаческий переход в комнату
     socket.on(Events.create.room, (key: string) => router.push(`/r/${key}`));
     //Получаем пользователей комнаты
-    socket.on(Events.server.updateUsers, (users: Users) => {
+    socket.on(Events.server.updateUsers, (users: User[]) => {
       console.log(users);
       store.commit(Events.front.setUsers, users);
     });
@@ -79,7 +79,7 @@ export function connection(user: User, router: Router, store: Store) {
     socket.on(Events.server.sendError, (e: string) => console.error(e));
   });
 
-  bus.$on(Events.create.room, () => socket.emit(Events.create.room, user.id));
+  bus.$on(Events.create.room, () => socket.emit(Events.create.room, user));
   bus.$on(Events.get.room.id, (key: string) => joinRoom(key));
   bus.$on(Events.poker.setBalance, (card: string) => setBalance(card));
   bus.$on(Events.poker.promotionAdmin, promotionAdmin);

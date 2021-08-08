@@ -6,7 +6,6 @@ import { UserId } from "../interfaces/iuser";
 import { v4 as uuidv4 } from "uuid";
 import { RoomKey } from "../interfaces/iroom";
 import { IEnter } from "../interfaces/interfaces";
-import { connection } from "../../frontend/src/client";
 
 export class Server {
   private socket: Socket;
@@ -23,13 +22,10 @@ export class Server {
 
   public async createRoom(data: IEnter) {
     try {
-      console.log("create room");
       let key = uuidv4() as RoomKey;
       this.socket.emit(Events.create.room, key);
 
-      console.log("create user start");
       await this.createUser(data, true);
-      console.log("create user end");
       await this.room.create(key);
     } catch (e) {
       this.sendError(e);
@@ -40,7 +36,6 @@ export class Server {
     data: IEnter,
     creator: boolean = false
   ): Promise<void> {
-    console.log("create user");
     await this.user.add({
       socketId: data.id,
       room: data.key,
@@ -51,7 +46,6 @@ export class Server {
   }
 
   public async enterRoom(data: IEnter) {
-    console.log("enter room");
     try {
       if (!data.id || !data.key) {
         return false;
@@ -65,7 +59,6 @@ export class Server {
       }
       this.socket.join(data.key);
       await this.user.enter(data.id, data.key);
-      console.log("enter end");
       this.updateUsers(data.key);
     } catch (e) {
       this.sendError(e);
@@ -111,11 +104,9 @@ export class Server {
 
   public async userDisconnect(userId: UserId) {
     try {
-      console.log("disconnect", userId);
-      // console.log("disconnect", this.socket.id);
       await this.user.deleteUser(userId);
       /*
-      //TODO: GGWP
+      //TODO: проверять если комната пустая, удалять комнату
       //Получаем userid и удаляем его из globalSocketUsers
       let useridtmp = globalSocketUsers[socket.id];
       delete globalSocketUsers[socket.id];
@@ -148,12 +139,10 @@ export class Server {
   }
 
   sendError(error: Error): void {
-    console.log(error);
     this.socket.emit(Events.server.sendError, error);
   }
 
   private async updateUsers(room: RoomKey): Promise<void> {
-    console.log("updateUsers");
     const users = await this.user.collection.find({ room: room }).toArray();
     this.io.to(room).emit(Events.server.updateUsers, users);
   }

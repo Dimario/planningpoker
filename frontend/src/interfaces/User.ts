@@ -1,11 +1,10 @@
 export interface User {
   id: string;
+  socketId: string;
   name: string;
   balance: string;
-  creater: boolean;
+  creator: boolean;
 }
-
-export type Users = { [key: string]: User };
 
 export interface SetUser {
   socket: string;
