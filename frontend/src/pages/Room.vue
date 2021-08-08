@@ -67,6 +67,7 @@ export default {
     const roomSettingsViewBalance = computed<boolean>(() => {
       return useStore().getters.roomSettingsViewBalance;
     });
+    const me = computed<User>(() => store.getters.me);
     const users = computed<User[]>(() => store.getters.users);
     const votedUsers = computed<User[]>(() => store.getters.votedUsers);
     const notVotedUsers = computed<User[]>(() => store.getters.notVotedUsers);
@@ -85,16 +86,6 @@ export default {
     onMounted(() => {
       bus.$emit(Events.get.room.id, route.params.key);
       bus.$emit(Events.statusBar.roomChange, route.params.key);
-    });
-
-    const me = computed<User>(() => {
-      if (users.value && userid.value) {
-        return users.value.filter(
-          (item: User) => item.socketId === userid.value
-        )[0];
-      }
-
-      return { id: "", name: "", creator: false, balance: "", socketId: "" };
     });
 
     const checkAdmin = computed<boolean>(() => {

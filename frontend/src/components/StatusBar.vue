@@ -8,7 +8,7 @@
 <script lang="ts">
 import bus from "@/lib/bus";
 import { Events } from "@/const";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { Store, useStore } from "@/store/store";
 
 export default {
@@ -17,8 +17,7 @@ export default {
     const store: Store = useStore();
     const status = ref<string>("");
     const room = ref<string>("");
-    const name = ref<string>("");
-    name.value = store.getters.name;
+    const name = computed<string>(() => store.getters.name);
 
     bus.$on(
       Events.statusBar.statusChange,

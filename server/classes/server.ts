@@ -102,6 +102,15 @@ export class Server {
     }
   }
 
+  public async changeName(data: IEnter): Promise<void> {
+    try {
+      await this.user.changeName(data.id, data.name);
+      this.updateUsers(data.key);
+    } catch (e) {
+      this.sendError(e);
+    }
+  }
+
   public async userDisconnect(userId: UserId) {
     try {
       await this.user.deleteUser(userId);

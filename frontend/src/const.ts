@@ -14,6 +14,7 @@ export const Events = {
     joinRoom: "join-in-room",
     updateUsers: "update-users",
     sendError: "send-error",
+    changeName: "server-change-name",
   },
   statusBar: {
     statusChange: "status-change",

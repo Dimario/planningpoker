@@ -1,21 +1,18 @@
 import { Socket } from "socket.io";
-
 import { v4 as uuidv4 } from "uuid";
-
-const express = require("express");
-const http = require("http");
-const app = express();
-const server = http.createServer(app).listen(3002);
-const io = require("socket.io")(server, { cors: { origin: "*" } });
-import { Events } from "../frontend/src/const";
-
 import { MongoClient, Db } from "mongodb";
 import { UserId } from "./interfaces/iuser";
 import { User } from "./classes/user";
 import { Room } from "./classes/room";
 import { Server } from "./classes/server";
 import { IEnter } from "./interfaces/interfaces";
-import { RoomKey } from "./interfaces/iroom";
+import { Events } from "../frontend/src/const";
+
+const express = require("express");
+const http = require("http");
+const app = express();
+const server = http.createServer(app).listen(3002);
+const io = require("socket.io")(server, { cors: { origin: "*" } });
 
 async function mongoConnection() {
   let Client = MongoClient,
@@ -79,6 +76,11 @@ async function mainWay(db: Db) {
     //Отказаться от администрирования
     socket.on(Events.poker.refuseAdmin, (data: IEnter) =>
       SERVER.refuseAdmin(data)
+    );
+
+    //Смена имени
+    socket.on(Events.server.changeName, (data: IEnter) =>
+      SERVER.changeName(data)
     );
 
     //Админ -> начало голосования

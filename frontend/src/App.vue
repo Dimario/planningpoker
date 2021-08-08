@@ -41,7 +41,8 @@ export default {
       id: computed(() => id.value),
       name: computed(() => name.value),
       balance: "-1",
-      creater: false,
+      creator: false,
+      socketId: "",
     });
     const room = ref<string>();
     const showName = ref<boolean>(false);

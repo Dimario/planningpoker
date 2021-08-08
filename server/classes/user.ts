@@ -1,4 +1,4 @@
-import { Callback, Collection, Filter, FindCursor } from "mongodb";
+import { Callback, Collection } from "mongodb";
 import { IUser, UserId } from "../interfaces/iuser";
 import { RoomKey } from "../interfaces/iroom";
 
@@ -55,6 +55,14 @@ export class User {
     await this.collection.replaceOne(
       { socketId: socketId },
       { ...item, creator: creator }
+    );
+  }
+
+  public async changeName(socketId: UserId, name: string): Promise<void> {
+    const item: IUser = await this.get(socketId);
+    await this.collection.replaceOne(
+      { socketId: socketId },
+      { ...item, name: name }
     );
   }
 

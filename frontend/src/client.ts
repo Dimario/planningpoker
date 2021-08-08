@@ -15,7 +15,6 @@ export function connection(user: User, router: Router, store: Store) {
 
   //Событие захода в комнату
   const joinRoom = (roomKey: string) => {
-    console.log("Заходим");
     room = roomKey;
     socket.emit(Events.server.joinRoom, {
       key: roomKey,
@@ -47,6 +46,14 @@ export function connection(user: User, router: Router, store: Store) {
 
   const endVote = () => {
     socket.emit(Events.poker.endVote, { id: user.id, key: room });
+  };
+
+  const changeName = () => {
+    socket.emit(Events.server.changeName, {
+      id: user.id,
+      key: room,
+      name: user.name,
+    });
   };
 
   socket.on("connect", () => {
@@ -86,4 +93,5 @@ export function connection(user: User, router: Router, store: Store) {
   bus.$on(Events.poker.refuseAdmin, refuseAdmin);
   bus.$on(Events.poker.startVote, startVote);
   bus.$on(Events.poker.endVote, endVote);
+  bus.$on(Events.server.changeName, changeName);
 }
