@@ -25,58 +25,37 @@ export class User {
   }
 
   public async enter(socketId: UserId, roomId: RoomKey): Promise<void> {
-    await this.getItem(socketId, (err: Error, item: IUser) => {
-      this.collection.replaceOne(
-        { socketId: socketId },
-        { ...item, room: roomId }
-      );
-    });
-  }
-
-  /*  public create(socketId: UserId, roomId: RoomKey): void {
-    this.getItem(socketId, (err: Error, item: IUser) => {
-      this.collection.replaceOne(
-        { room: roomId },
-        { ...item, room: roomId, creator: true }
-      );
-    });
-  }*/
-
-  public async getRoomUsers(roomId: RoomKey): Promise<IUser[]> {
-    return await this.collection.find({ room: roomId }).toArray();
+    const item = await this.get(socketId);
+    await this.collection.replaceOne(
+      { socketId: socketId },
+      { ...item, room: roomId }
+    );
   }
 
   public async changeBalance(
     socketId: UserId,
     balance: string | number
   ): Promise<void> {
-    return new Promise(async (resolve) => {
-      await this.getItem(socketId, async (err: Error, item: IUser) => {
-        item.balance = balance;
-        await this.collection
-          .replaceOne({ socketId: socketId }, item)
-          .then(() => resolve());
-      });
-    });
+    const item: IUser = await this.get(socketId);
+    await this.collection.replaceOne(
+      { socketId: socketId },
+      { ...item, balance: balance }
+    );
   }
 
   public async resetBalance(roomId: RoomKey): Promise<void> {
-    return new Promise(async (resolve) => {
-      this.collection
-        .updateMany({ room: roomId }, { $set: { balance: -1 } })
-        .then(() => resolve());
-    });
+    await this.collection.updateMany(
+      { room: roomId },
+      { $set: { balance: -1 } }
+    );
   }
 
   public async changeAdmin(socketId: UserId, creator: boolean): Promise<void> {
-    return new Promise(async (resolve) => {
-      await this.getItem(socketId, async (err: Error, item: IUser) => {
-        item.creator = creator;
-        await this.collection
-          .replaceOne({ socketId: socketId }, item)
-          .then(() => resolve());
-      });
-    });
+    const item: IUser = await this.get(socketId);
+    await this.collection.replaceOne(
+      { socketId: socketId },
+      { ...item, creator: creator }
+    );
   }
 
   public async deleteUser(socketId: UserId): Promise<void> {

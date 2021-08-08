@@ -15,6 +15,7 @@ import { User } from "./classes/user";
 import { Room } from "./classes/room";
 import { Server } from "./classes/server";
 import { IEnter } from "./interfaces/interfaces";
+import { RoomKey } from "./interfaces/iroom";
 
 async function mongoConnection() {
   let Client = MongoClient,
@@ -47,28 +48,7 @@ async function mainWay(db: Db) {
   await USER.drop();
   await ROOM.drop();
 
-  /*await USER.drop();
-  await ROOM.drop();
-
-  await USER.add({
-    socketId: "test2",
-    room: "1",
-    balance: -1,
-    creator: false,
-    name: "test",
-  });
-  await USER.add({
-    socketId: "test3",
-    room: "1",
-    balance: 999,
-    creator: false,
-    name: "test",
-  });
-
-  await USER.changeBalance("test2", 100);
-  console.log(await USER.getRoomUsers("1"));
-  await USER.resetBalance("1");
-  console.log(await USER.getRoomUsers("1"));*/
+  let globalSocketUser: { [key: string]: string } = {};
 
   io.on("connection", async (socket: Socket) => {
     const SERVER = new Server(io, socket, USER, ROOM);
@@ -78,11 +58,10 @@ async function mainWay(db: Db) {
       socket: socket.id,
       id: userid,
     });
+    globalSocketUser[socket.id] = userid;
 
     //Событие создание комнаты
-    socket.on(Events.create.room, (userid: UserId) =>
-      SERVER.createRoom(userid)
-    );
+    socket.on(Events.create.room, (data: IEnter) => SERVER.createRoom(data));
 
     //Вход в комнату
     socket.on(Events.server.joinRoom, (data: IEnter) => SERVER.enterRoom(data));
@@ -110,9 +89,8 @@ async function mainWay(db: Db) {
 
     //Отключение
     socket.on("disconnect", () => {
-      console.log(socket.id);
-      console.log(socket.client);
-      SERVER.userDisconnect(socket);
+      SERVER.userDisconnect(globalSocketUser[socket.id]);
+      delete globalSocketUser[socket.id];
     });
   });
 }
