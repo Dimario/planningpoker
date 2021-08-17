@@ -2,14 +2,14 @@
   <div class="statusBar">
     <div>Статус: {{ status }}</div>
     <div>Комната: {{ room }}</div>
-    <div>{{ name }} <span @click="editName">✏️</span></div>
+    <button class="inline" @click="editName">{{ name }}</button>
   </div>
 </template>
 <script lang="ts">
-import bus from "@/lib/bus";
-import { Events } from "@/const";
+import bus from "../lib/bus";
 import { computed, ref } from "vue";
-import { Store, useStore } from "@/store/store";
+import { Events } from "../const";
+import { Store, useStore } from "../store/store";
 
 export default {
   name: "StatusBar",
@@ -25,9 +25,7 @@ export default {
     );
     bus.$on(Events.statusBar.roomChange, (text: string) => (room.value = text));
 
-    const editName = () => {
-      bus.$emit(Events.statusBar.editName, true);
-    };
+    const editName = () => bus.$emit(Events.statusBar.editName, true);
 
     return { status, room, name, editName };
   },

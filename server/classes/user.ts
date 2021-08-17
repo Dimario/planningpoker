@@ -1,14 +1,9 @@
-import { Callback, Collection } from "mongodb";
-import { IUser, UserId } from "../interfaces/iuser";
-import { RoomKey } from "../interfaces/iroom";
+import { Callback } from "mongodb";
+import { RoomKey } from "../../interfaces/iroom";
+import { IUser, UserId } from "../../interfaces/iuser";
+import { DbCollection } from "./DbCollection";
 
-export class User {
-  public collection: Collection;
-
-  constructor(collection: Collection) {
-    this.collection = collection;
-  }
-
+export class User extends DbCollection {
   public async add(user: IUser): Promise<void> {
     await this.collection.insertOne(user);
   }
@@ -68,9 +63,5 @@ export class User {
 
   public async deleteUser(socketId: UserId): Promise<void> {
     await this.collection.deleteOne({ socketId: socketId });
-  }
-
-  public async drop() {
-    await this.collection.deleteMany({});
   }
 }

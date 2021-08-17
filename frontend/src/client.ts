@@ -1,13 +1,13 @@
 import io from "socket.io-client";
-import bus from "@/lib/bus";
-import { Events, StatusSocket } from "@/const";
+import bus from "./lib/bus";
 import { Router } from "vue-router";
-import { Store } from "@/store/store";
-import { User } from "@/interfaces/User";
+import { IUser } from "../../interfaces/iuser";
+import { Store } from "./store/store";
+import { Events, StatusSocket } from "./const";
 
 const server = `http://${location.hostname}:3002`;
 
-export function connection(user: User, router: Router, store: Store) {
+export function connection(user: IUser, router: Router, store: Store) {
   const socket = io(`${server}?userid=${user.id}`);
 
   let room = "";
@@ -73,7 +73,7 @@ export function connection(user: User, router: Router, store: Store) {
     //Ответ после создания комнаты и автомаческий переход в комнату
     socket.on(Events.create.room, (key: string) => router.push(`/r/${key}`));
     //Получаем пользователей комнаты
-    socket.on(Events.server.updateUsers, (users: User[]) => {
+    socket.on(Events.server.updateUsers, (users: IUser[]) => {
       console.log(users);
       store.commit(Events.front.setUsers, users);
     });

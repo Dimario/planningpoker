@@ -1,22 +1,22 @@
 <template>
-  <div class="users" v-if="$props.users">
+  <div v-if="$props.users" class="users">
     <div v-for="item in $props.users" :key="item.id" class="user">
       <template v-if="$props.needShowBalance">
-        <div class="balance" v-if="$props.balance">
+        <div v-if="$props.balance" class="balance">
           {{ item.balance }}
         </div>
-        <div class="balance" v-else>*</div>
+        <div v-else class="balance">*</div>
       </template>
       <div class="name">{{ item.name }}</div>
     </div>
   </div>
 </template>
 <script lang="ts">
-import { Users } from "../interfaces/User";
+import { IUser } from "../../../interfaces/iuser";
 import { PropType } from "vue";
 
 interface Props {
-  users: Users;
+  users: IUser[];
   needShowBalance: boolean;
   balance: boolean;
 }
@@ -24,7 +24,10 @@ interface Props {
 export default {
   name: "UserList",
   props: {
-    users: Object as PropType<Users>,
+    users: {
+      type: Array as PropType<IUser[]>,
+      default: () => [],
+    },
     needShowBalance: {
       type: Boolean,
       default: false,

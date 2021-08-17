@@ -10,7 +10,7 @@
 <script lang="ts">
 import StatusBar from "@/components/StatusBar.vue";
 import SetName from "@/components/SetName.vue";
-import bus from "@/lib/bus";
+import bus from "./lib/bus";
 import { Events, StatusSocket } from "@/const";
 import { computed, onMounted, ref, reactive } from "vue";
 import { Store, useStore } from "@/store/store";

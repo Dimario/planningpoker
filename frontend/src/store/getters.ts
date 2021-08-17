@@ -1,25 +1,25 @@
 import { GetterTree } from "vuex";
-import { State } from "@/store/state";
-import { User } from "@/interfaces/User";
+import { State } from "./state";
+import { IUser } from "../../../interfaces/iuser";
 
 export type Getters<S = State> = {
-  me(state: S): User;
+  me(state: S): IUser;
   name(state: S): string;
   socketUserId(state: S): string;
-  users(state: S): User[];
-  notVotedUsers(state: S): User[];
-  votedUsers(state: S): User[];
+  users(state: S): IUser[];
+  notVotedUsers(state: S): IUser[];
+  votedUsers(state: S): IUser[];
   id(state: S): string;
   roomSettingsViewBalance(state: S): boolean;
 };
 
 export const getters: GetterTree<State, State> & Getters = {
-  me: (state): User => {
+  me: (state): IUser => {
     if (state.users) {
-      return state.users.filter((item: User) => item.socketId === state.id)[0];
+      return state.users.filter((item: IUser) => item.socketId === state.id)[0];
     }
 
-    return { id: "", name: "", creator: false, balance: "", socketId: "" };
+    return { socketId: "", name: "", creator: false, balance: "", room: "" };
   },
   name: (state): string => {
     return state.name || "";
@@ -27,13 +27,13 @@ export const getters: GetterTree<State, State> & Getters = {
   socketUserId: (state): string => {
     return state.socketUserId || "";
   },
-  users: (state): User[] => {
+  users: (state): IUser[] => {
     return state.users;
   },
-  notVotedUsers: (state): User[] => {
+  notVotedUsers: (state): IUser[] => {
     return state.notVotedUsers;
   },
-  votedUsers: (state): User[] => {
+  votedUsers: (state): IUser[] => {
     return state.votedUsers;
   },
   id: (state): string => {

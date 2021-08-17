@@ -17,43 +17,41 @@
     <template v-if="me && me.creator">
       <div class="h25-title">Действия</div>
 
-      <div class="actions">
-        <div class="action" @click="startVote">Начать голосование</div>
-        <div class="action" @click="endVote">Закончить голосование</div>
-        <div class="action" @click="refuseAdmin">
+      <div class="actions h80">
+        <button class="action" @click="startVote">Начать голосование</button>
+        <button class="action" @click="endVote">Закончить голосование</button>
+        <button class="action" @click="refuseAdmin">
           Не хочу быть администратором стола
-        </div>
+        </button>
       </div>
     </template>
     <template v-else>
-      <div class="cards-wrapper">
-        <div class="cards">
-          <div
-            v-for="(item, index) in cards"
-            :key="`card-${index}`"
-            class="card"
-            :class="{ active: item === choiseCard }"
-            @click="setChoiseCard(item)"
-          >
-            {{ item }}
-          </div>
-        </div>
+      <div class="cards h80">
+        <button
+          v-for="(item, index) in cards"
+          :key="`card-${index}`"
+          class="card"
+          :class="{ active: item === choiseCard }"
+          @click="setChoiseCard(item)"
+        >
+          {{ item }}
+        </button>
       </div>
     </template>
-    <div v-if="!checkAdmin">
+    <div v-if="!checkAdmin" class="h20 align-center">
       В комнате отсутствует администратор.
-      <span @click="promotion">Стать администратором</span>
+      <button class="inline" @click="promotion">Стать администратором</button>
     </div>
   </div>
 </template>
 <script lang="ts">
-import bus from "@/lib/bus";
-import { Events, StatusSocket } from "@/const";
+import bus from "../lib/bus";
 import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "@/store/store";
-import { User } from "@/interfaces/User";
 import UserList from "@/components/UserList.vue";
+import { IUser } from "../../../interfaces/iuser";
+import { Events, StatusSocket } from "../const";
 
 export default {
   name: "Room",
@@ -67,10 +65,10 @@ export default {
     const roomSettingsViewBalance = computed<boolean>(() => {
       return useStore().getters.roomSettingsViewBalance;
     });
-    const me = computed<User>(() => store.getters.me);
-    const users = computed<User[]>(() => store.getters.users);
-    const votedUsers = computed<User[]>(() => store.getters.votedUsers);
-    const notVotedUsers = computed<User[]>(() => store.getters.notVotedUsers);
+    const me = computed<IUser>(() => store.getters.me);
+    const users = computed<IUser[]>(() => store.getters.users);
+    const votedUsers = computed<IUser[]>(() => store.getters.votedUsers);
+    const notVotedUsers = computed<IUser[]>(() => store.getters.notVotedUsers);
     const votedUsersCount = computed<number>(() => votedUsers.value.length);
     const cards = ["1", "2", "3", "5", "8", "13", "21", "?"];
     const choiseCard = ref<string>("");
@@ -90,7 +88,9 @@ export default {
 
     const checkAdmin = computed<boolean>(() => {
       if (users.value) {
-        return Boolean(users.value.filter((item: User) => item.creator).length);
+        return Boolean(
+          users.value.filter((item: IUser) => item.creator).length
+        );
       }
 
       return false;

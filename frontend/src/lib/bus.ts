@@ -1,14 +1,16 @@
-import mitt from "mitt";
-// @ts-ignore
-const emitter = new mitt();
+import mitt, { Emitter } from "mitt";
+import { EventType, Handler } from "mitt/src/index";
+
+//@ts-ignore
+const emitter: Emitter = mitt();
 
 export default {
-  $on: (event: string, callback: Function | void): void => {
+  $on: (event: EventType, callback: Handler): void => {
     emitter.on(event, callback);
   },
-  $off: (event: string, callback: Function | void): void =>
+  $off: (event: EventType, callback: Handler): void =>
     emitter.off(event, callback),
-  $emit: (event: string, data?: any): void => {
+  $emit: (event: EventType, data?: any): void => {
     emitter.emit(event, data);
   },
 };

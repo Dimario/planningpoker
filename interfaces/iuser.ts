@@ -6,4 +6,10 @@ export interface IUser {
   creator: boolean;
   balance: number | string;
   name?: string;
+  id?: string;
+}
+
+export interface SetUser {
+  socket: string;
+  id: string;
 }

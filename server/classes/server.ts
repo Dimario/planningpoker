@@ -2,22 +2,31 @@ import { Socket } from "socket.io";
 import { User } from "./user";
 import { Room } from "./room";
 import { Events } from "../../frontend/src/const";
-import { UserId } from "../interfaces/iuser";
+import { UserId } from "../../interfaces/iuser";
 import { v4 as uuidv4 } from "uuid";
-import { RoomKey } from "../interfaces/iroom";
-import { IEnter } from "../interfaces/interfaces";
+import { RoomKey } from "../../interfaces/iroom";
+import { IEnter } from "../../interfaces/interfaces";
+import { Administrators } from "./administrators";
 
 export class Server {
   private socket: Socket;
   private user: User;
   private room: Room;
+  private administrators: Administrators;
   private io: any;
 
-  constructor(io: any, socket: Socket, user: User, room: Room) {
+  constructor(
+    io: any,
+    socket: Socket,
+    user: User,
+    room: Room,
+    administrators: Administrators
+  ) {
     this.io = io;
     this.socket = socket;
     this.user = user;
     this.room = room;
+    this.administrators = administrators;
   }
 
   public async createRoom(data: IEnter) {
@@ -26,6 +35,7 @@ export class Server {
       this.socket.emit(Events.create.room, key);
 
       await this.createUser(data, true);
+      await this.administrators.create(data.id, key);
       await this.room.create(key);
     } catch (e) {
       this.sendError(e);
@@ -51,24 +61,32 @@ export class Server {
         return false;
       }
 
+      // console.log(data);
+      const creator = await this.administrators.get(data.id);
+      const creatorLogic = creator ? creator.room === data.key : false;
+
+      // console.log(creator);
+      console.log(creatorLogic);
+
       if (
         !(await this.user.collection.find({ socketId: data.id }).toArray())
           .length
       ) {
-        await this.createUser(data);
+        await this.createUser(data, creatorLogic);
       }
       this.socket.join(data.key);
       await this.user.enter(data.id, data.key);
-      this.updateUsers(data.key);
+      await this.updateUsers(data.key);
     } catch (e) {
       this.sendError(e);
     }
   }
 
   public async changeBalance(data: IEnter) {
+    console.log("change-balance", data);
     try {
       await this.user.changeBalance(data.id, data.balance);
-      this.updateUsers(data.key);
+      await this.updateUsers(data.key);
     } catch (e) {
       this.sendError(e);
     }
@@ -76,8 +94,9 @@ export class Server {
 
   public async promotionAdmin(data: IEnter): Promise<void> {
     try {
+      await this.administrators.create(data.id, data.key);
       await this.user.changeAdmin(data.id, true);
-      this.updateUsers(data.key);
+      await this.updateUsers(data.key);
     } catch (e) {
       this.sendError(e);
     }
@@ -85,8 +104,9 @@ export class Server {
 
   public async refuseAdmin(data: IEnter): Promise<void> {
     try {
+      await this.administrators.delete(data.id);
       await this.user.changeAdmin(data.id, false);
-      this.updateUsers(data.key);
+      await this.updateUsers(data.key);
     } catch (e) {
       this.sendError(e);
     }
@@ -95,7 +115,7 @@ export class Server {
   public async startVote(data: IEnter): Promise<void> {
     try {
       await this.user.resetBalance(data.key);
-      this.updateUsers(data.key);
+      await this.updateUsers(data.key);
       this.io.to(data.key).emit(Events.poker.startVoteServer);
     } catch (e) {
       this.sendError(e);
@@ -105,7 +125,7 @@ export class Server {
   public async changeName(data: IEnter): Promise<void> {
     try {
       await this.user.changeName(data.id, data.name);
-      this.updateUsers(data.key);
+      await this.updateUsers(data.key);
     } catch (e) {
       this.sendError(e);
     }
@@ -114,30 +134,8 @@ export class Server {
   public async userDisconnect(userId: UserId) {
     try {
       await this.user.deleteUser(userId);
-      /*
-      //TODO: проверять если комната пустая, удалять комнату
-      //Получаем userid и удаляем его из globalSocketUsers
-      let useridtmp = globalSocketUsers[socket.id];
-      delete globalSocketUsers[socket.id];
-      //Получаем user по userid и удаляем его из globalUsers
-      let usertmp = globalUsers[useridtmp];
-      delete globalUsers[useridtmp];
-      //Получаем комнату если есть
-      if (usertmp && typeof usertmp.room === "string") {
-        socket.leave(usertmp.room);
-        let users = userRoom.get(usertmp.room);
-        if (users[useridtmp]) {
-          delete users[useridtmp];
-          userRoom.set(usertmp.room, users);
-        }
-
-        //Отправляем всем кто есть в этой комнате
-        io.to(usertmp.room).emit(
-          Events.server.updateUsers,
-          userRoom.get(usertmp.room)
-        );
-      }
-       */
+      // TODO: проверять если комната пустая, удалять комнату
+      // TODO: запускать таймер, для удаления администратора если он не зайдет через N секунд, удалять запись
     } catch (e) {
       this.sendError(e);
     }

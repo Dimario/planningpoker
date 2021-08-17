@@ -1,13 +1,8 @@
-import { Callback, Collection } from "mongodb";
-import { IRoom, RoomKey } from "../interfaces/iroom";
+import { Callback } from "mongodb";
+import { IRoom, RoomKey } from "../../interfaces/iroom";
+import { DbCollection } from "./DbCollection";
 
-export class Room {
-  public collection: Collection;
-
-  constructor(collection: Collection) {
-    this.collection = collection;
-  }
-
+export class Room extends DbCollection {
   public async create(roomId: RoomKey): Promise<void> {
     await this.collection.insertOne({ room: roomId });
   }
@@ -18,9 +13,5 @@ export class Room {
 
   public getItem(roomId: RoomKey, callback: Callback): void {
     this.collection.findOne({ room: roomId }, callback);
-  }
-
-  public drop() {
-    this.collection.deleteMany({});
   }
 }

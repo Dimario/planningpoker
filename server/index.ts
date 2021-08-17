@@ -1,12 +1,13 @@
 import { Socket } from "socket.io";
 import { v4 as uuidv4 } from "uuid";
 import { MongoClient, Db } from "mongodb";
-import { UserId } from "./interfaces/iuser";
+import { UserId } from "../interfaces/iuser";
+import { Server } from "./classes/server";
+import { IEnter } from "../interfaces/interfaces";
+import { Events } from "../frontend/src/const";
+import { Administrators } from "./classes/administrators";
 import { User } from "./classes/user";
 import { Room } from "./classes/room";
-import { Server } from "./classes/server";
-import { IEnter } from "./interfaces/interfaces";
-import { Events } from "../frontend/src/const";
 
 const express = require("express");
 const http = require("http");
@@ -41,14 +42,16 @@ console.log("Start server");
 async function mainWay(db: Db) {
   const USER = new User(db.collection("users"));
   const ROOM = new Room(db.collection("rooms"));
+  const ADMINISTRATORS = new Administrators(db.collection("administrators"));
 
   await USER.drop();
   await ROOM.drop();
+  await ADMINISTRATORS.drop();
 
   let globalSocketUser: { [key: string]: string } = {};
 
   io.on("connection", async (socket: Socket) => {
-    const SERVER = new Server(io, socket, USER, ROOM);
+    const SERVER = new Server(io, socket, USER, ROOM, ADMINISTRATORS);
     const userid: UserId = String(socket.handshake.query.userid) || uuidv4();
 
     socket.emit("set-user", {
@@ -96,8 +99,3 @@ async function mainWay(db: Db) {
     });
   });
 }
-
-app.use(function (req: any, res: any, next: any) {
-  console.log("Time: %d", Date.now());
-  next();
-});

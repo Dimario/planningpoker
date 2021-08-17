@@ -15,10 +15,10 @@
 </template>
 <script lang="ts">
 import { computed, ref } from "vue";
-import { Store, useStore } from "@/store/store";
-import { Events } from "@/const";
-import bus from "@/lib/bus";
-import { User } from "@/interfaces/User";
+import { Store, useStore } from "../store/store";
+import { Events } from "../const";
+import bus from "../lib/bus";
+import { IUser } from "../../../interfaces/iuser";
 
 interface Props {
   isEdit: boolean;
@@ -35,16 +35,14 @@ export default {
   setup(props: Props) {
     const store: Store = useStore();
     const name = computed<string>(() => store.getters.name);
-    const me = computed<User>(() => store.getters.me);
-    const nameLength = computed(() => name.value.length);
-    const newName = ref<string>(me.value.name);
+    const me = computed<IUser>(() => store.getters.me);
+    const nameLength = computed<number>(() => name.value.length);
+    const newName = ref<string>(me.value ? me.value.name : "");
     const newNameLength = computed<number>(() =>
       newName.value ? newName.value.length : 0
     );
 
-    const disabled = computed<boolean>(() => {
-      return newNameLength.value < 3;
-    });
+    const disabled = computed<boolean>(() => newNameLength.value < 3);
 
     const setName = (): void => {
       store.commit(Events.front.setName, newName.value);
@@ -57,13 +55,9 @@ export default {
       localStorage["name"] = name.value;
     };
 
-    bus.$on(Events.front.keyUpEsc, () => {
-      if (props.isEdit) {
-        bus.$emit(Events.statusBar.editName);
-      } else {
-        bus.$emit(Events.statusBar.editName, false);
-      }
-    });
+    bus.$on(Events.front.keyUpEsc, () =>
+      bus.$emit(Events.statusBar.editName, !props.isEdit)
+    );
 
     return { name, nameLength, newName, disabled, setName, props };
   },

@@ -86,7 +86,6 @@ a {
 abbr[title] {
     border-bottom: none; /* 1 */
     text-decoration: underline; /* 2 */
-    text-decoration: underline dotted; /* 2 */
 }
 
 /**
@@ -163,6 +162,7 @@ input,
 optgroup,
 select,
 textarea {
+    outline: none;
     font-family: inherit; /* 1 */
     font-size: 100%; /* 1 */
     line-height: 1.15; /* 1 */
@@ -372,6 +372,7 @@ body{
 
 h1{
     font-size: 3em;
+    text-transform: uppercase;
 }
 
 button{
@@ -381,6 +382,16 @@ button{
     font-size: 1.5em;
     cursor: pointer;
     border: 5px solid #5f5f5f;
+}
+
+button.inline{
+    background: transparent;
+    border-width: 0;
+    padding: 0 10px;
+    font-size: 1em;
+}
+button.card, button.action{
+    border-width: 0;
 }
 
 button:focus, input:focus{
@@ -443,6 +454,17 @@ input{
     height: 32%;
     position: relative;
 }
+.h20{
+    height: 19%;
+}
+.h80{
+    height: 80%;
+}
+
+.align-center{
+    display: flex;
+    align-items: center;
+}
 
 .main .h25:nth-child(2){
     margin: 2% 0;
@@ -503,8 +525,7 @@ input{
 
 .action {
     padding: 15px;
-    width: 100px;
-    height: 100px;
+    width: 150px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -518,7 +539,7 @@ input{
     transition: background 0.3s ease-out;
 }
 
-.action:hover {
+.action:hover, .action:focus {
     background: #d8d8d8;
 }
 
@@ -550,15 +571,14 @@ input{
     box-sizing: border-box;
     transition: background 0.3s ease-out;
 }
-
-.cards-wrapper {
+.cards{
     overflow-x: auto;
 }
 .card {
     background: #fff;
     font-size: 3em;
     font-weight: bold;
-    padding: 25px 0px;
+    padding: 25px 0;
     margin-right: 15px;
     border-radius: 15px;
     width: 100px;

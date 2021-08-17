@@ -1,12 +1,12 @@
-import { User } from "@/interfaces/User";
+import { IUser } from "../../../interfaces/iuser";
 
 interface stateInterface {
   counter: number;
   name: string;
   socketUserId: string;
-  users: User[];
-  notVotedUsers: User[];
-  votedUsers: User[];
+  users: IUser[];
+  notVotedUsers: IUser[];
+  votedUsers: IUser[];
   status: string;
   id: string;
   roomSettingsViewBalance: boolean;

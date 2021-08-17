@@ -1,8 +1,7 @@
-//TODO: продумать как можно наказывать за изменение LocalStorage или обновлять сразу имя?
+// TODO: при изменении имени, обновлять его на сервере
+// TODO: при измении socketId обновлять страницу
 export default class LS {
   constructor() {
-    window.onstorage = () => {
-      console.log("WOO");
-    };
+    window.onstorage = () => {};
   }
 }
