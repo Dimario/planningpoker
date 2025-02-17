@@ -1,1 +1,0 @@
-cd /data/server/dist/ && node server.js

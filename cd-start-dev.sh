@@ -1,1 +1,0 @@
-cd /data/frontend && npm i && node node_modules/esbuild/install.js && npm run build && cd /data/server/ && npm i && npm run build && cd /data/server/dist/ && node server.js
